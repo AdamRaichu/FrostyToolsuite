@@ -122,6 +122,7 @@
     <Compile Include="Attributes\RegisterExecutionAction.cs" />
     <Compile Include="Attributes\RegisterCustomHandlerAttribute.cs" />
     <Compile Include="Attributes\RegisterDataExplorerContextMenuAttribute.cs" />
+    <Compile Include="Attributes\RegisterBlueprintEditorHandlerAttribute.cs" />
     <Compile Include="Attributes\RegisterGlobalTypeEditorAttribute.cs" />
     <Compile Include="Attributes\RegisterLocalizedStringDatabaseAttribute.cs" />
     <Compile Include="Attributes\RegisterMenuExtensionAttribute.cs" />

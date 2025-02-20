@@ -55,6 +55,10 @@ namespace Frosty.Core
 
         private List<string> m_userShaders = new List<string>();
 
+        private List<IBlueprintEditorHandler> m_blueprintEditorOpenAction = new List<IBlueprintEditorHandler>();
+
+        public IEnumerable<IBlueprintEditorHandler> BlueprintEditorOpenAction => m_blueprintEditorOpenAction;
+
         /// <summary>
         /// Retrieves a collection of data explorer context menu item extensions that have been loaded from plugins.
         /// </summary>
@@ -576,6 +580,10 @@ namespace Frosty.Core
                     else if (tmpAttr is RegisterCustomAssetManagerAttribute attr12)
                     {
                         App.AssetManager.RegisterCustomAssetManager(attr12.CustomAssetManagerType, attr12.CustomAssetManagerClassType);
+                    }
+                    else if (tmpAttr is RegisterBlueprintEditorHandlerAttribute attr13)
+                    {
+                        m_blueprintEditorOpenAction.Add((IBlueprintEditorHandler)Activator.CreateInstance(attr13.classToHandle));
                     }
                 }
             }
