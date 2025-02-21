@@ -18,6 +18,7 @@ using System.Linq;
 using System.Windows.Input;
 
 using Frosty.Core.Attributes;
+using Frosty.Core.Misc;
 
 //using System.IO;
 
@@ -388,19 +389,20 @@ namespace Frosty.Core.Controls.Editors
             popup.IsDropDownOpen = false;
         }
 
-        private class DefaultPointerRefEditorHandler : IBlueprintEditorHandler
-        {
-            public void OpenPointerRefAsGraph(PointerRef ptr, ComboBox popup)
-            {
-                FrostyMessageBox.Show("Missing valid handler for opening blueprint editor. Please make sure you have a version of the blueprint editor that supports this feature.", "Open in Blueprint Editor");
-            }
-        }
-
         private void BlueprintEditorButton_Click(object sender, RoutedEventArgs e)
         {
             IEnumerable<IBlueprintEditorHandler> handlerEnumerable = App.PluginManager.BlueprintEditorOpenAction;
-            IBlueprintEditorHandler handlerClass = handlerEnumerable.Count() == 0 ? new DefaultPointerRefEditorHandler() : handlerEnumerable.First();
-            handlerClass.OpenPointerRefAsGraph((PointerRef)Value, popup);
+            IBlueprintEditorHandler handlerClass = handlerEnumerable.Count() == 0 ? new DefaultBlueprintEditorHandler() : handlerEnumerable.First();
+            PointerRef ptr = (PointerRef)Value;
+            if (ptr.Type == PointerRefType.External)
+            {
+                EbxAssetEntry asset = App.AssetManager.GetEbxEntry(ptr.External.FileGuid);
+                if (asset == null)
+                {
+                    return;
+                }
+                handlerClass.OpenAssetAsGraph(asset);
+            }
             popup.IsDropDownOpen = false;
         }
 
