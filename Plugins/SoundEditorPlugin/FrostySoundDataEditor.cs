@@ -1,4 +1,5 @@
-﻿using Frosty.Core.Controls;
+﻿using DuplicationPlugin;
+using Frosty.Core.Controls;
 using Frosty.Core.Windows;
 using FrostySdk.Interfaces;
 using FrostySdk.IO;
@@ -22,6 +23,9 @@ using FrostySdk.Managers;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using WaveFormatExtensible = SharpDX.Multimedia.WaveFormatExtensible;
+using System.Windows.Controls.Primitives;
+using FrostySdk;
+using Frosty.Controls;
 
 namespace SoundEditorPlugin
 {
@@ -349,17 +353,23 @@ namespace SoundEditorPlugin
     [TemplatePart(Name = PART_TracksListBox, Type = typeof(ListView))]
     [TemplatePart(Name = PART_PlayButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_StopButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_PlayAllButton, Type = typeof(Button))]
+    [TemplatePart(Name = PART_PlayAllFromButton, Type = typeof(Button))]
     [TemplatePart(Name = PART_VolumeSlider, Type = typeof(Slider))]
     [TemplatePart(Name = PART_SoundExportMenuItem, Type = typeof(MenuItem))]
     [TemplatePart(Name = PART_SoundImportMenuItem, Type = typeof(MenuItem))]
+    [TemplatePart(Name = PART_DuplicateTrackMenuItem, Type = typeof(MenuItem))]
     public class FrostySoundDataEditor : FrostyAssetEditor
     {
         private const string PART_TracksListBox = "PART_TracksListBox";
         private const string PART_PlayButton = "PART_PlayButton";
         private const string PART_StopButton = "PART_StopButton";
+        private const string PART_PlayAllButton = "PART_PlayAllButton";
+        private const string PART_PlayAllFromButton = "PART_PlayAllFromButton";
         private const string PART_VolumeSlider = "PART_VolumeSlider";
         private const string PART_SoundExportMenuItem = "PART_SoundExportMenuItem";
         private const string PART_SoundImportMenuItem = "PART_SoundImportMenuItem";
+        private const string PART_DuplicateTrackMenuItem = "PART_DuplicateTrackMenuItem";
 
         public static readonly DependencyProperty TracksListProperty = DependencyProperty.Register("TracksList", typeof(ObservableCollection<SoundDataTrack>), typeof(FrostySoundDataEditor), new FrameworkPropertyMetadata(null));
         public ObservableCollection<SoundDataTrack> TracksList
@@ -373,9 +383,13 @@ namespace SoundEditorPlugin
         private ListView tracksListBox;
         private Button playButton;
         private Button stopButton;
+        private Button playAllButton;
+        private Button playAllFromButton;
         private Slider volumeSlider;
         private AudioPlayer audioPlayer;
         private bool bFirstTime = true;
+
+        private bool hasPressedStopOnPlayAll = false;
 
         public FrostySoundDataEditor(ILogger inLogger) 
             : base(inLogger)
@@ -399,6 +413,12 @@ namespace SoundEditorPlugin
             stopButton = GetTemplateChild(PART_StopButton) as Button;
             stopButton.Click += StopButton_Click;
 
+            playAllButton = GetTemplateChild(PART_PlayAllButton) as Button;
+            playAllButton.Click += PlayAllButton_Click;
+
+            playAllFromButton = GetTemplateChild(PART_PlayAllFromButton) as Button;
+            playAllFromButton.Click += PlayAllFromButton_Click;
+
             volumeSlider = GetTemplateChild(PART_VolumeSlider) as Slider;
 
             volumeSlider.Value = Math.Min(Config.Get<float>("SoundVolume", 20.0f), 100);
@@ -411,13 +431,17 @@ namespace SoundEditorPlugin
             mi.Click += SoundExportMenuItem_Click;
             mi = GetTemplateChild(PART_SoundImportMenuItem) as MenuItem;
             mi.Click += SoundImportMenuItem_Click;
+            mi = GetTemplateChild(PART_DuplicateTrackMenuItem) as MenuItem;
+            mi.Click += DuplicateTrackMenuItem_Click;
             Loaded += FrostySoundDataEditor_Loaded;
 
             TracksList = new ObservableCollection<SoundDataTrack>();
         }
 
+
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
+            hasPressedStopOnPlayAll = true;
             audioPlayer.SoundDispose();
             stopButton.IsEnabled = false;
 
@@ -435,6 +459,8 @@ namespace SoundEditorPlugin
 
             playButton.IsEnabled = false;
             stopButton.IsEnabled = true;
+            playAllButton.IsEnabled = false;
+            playAllFromButton.IsEnabled = false;
 
             await Dispatcher.InvokeAsync(async () =>
             {
@@ -447,7 +473,67 @@ namespace SoundEditorPlugin
                 currentTrack.Progress = 0;
                 stopButton.IsEnabled = false;
                 playButton.IsEnabled = true;
+                playAllButton.IsEnabled = true;
+                playAllFromButton.IsEnabled = true;
             });
+        }
+
+        private void PlayAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            playMultipleTracksLogic(false, null);
+        }
+
+        private void PlayAllFromButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!(tracksListBox.SelectedItem is SoundDataTrack currentTrack))
+                return;
+
+            playMultipleTracksLogic(true, currentTrack);
+        }
+
+        private async void playMultipleTracksLogic(bool useStartFromTrack, SoundDataTrack startTrack)
+        {
+            playButton.IsEnabled = false;
+            playAllButton.IsEnabled = false;
+            playAllFromButton.IsEnabled = false;
+            stopButton.IsEnabled = true;
+
+            bool hasReachedTargetTrack = false;
+
+            foreach (SoundDataTrack track in TracksList)
+            {
+                if (hasPressedStopOnPlayAll) continue;
+                if (useStartFromTrack && !hasReachedTargetTrack)
+                {
+                    if (track == startTrack)
+                    {
+                        hasReachedTargetTrack = true;
+                    } else
+                    {
+                        continue;
+                    }
+                }
+
+                audioPlayer.OutputVoice.SetVolume((float)(volumeSlider.Value / 100.0));
+                audioPlayer.PlaySound(track);
+
+                //await Dispatcher.InvokeAsync(async () =>
+                //{
+                while (IsPlaying)
+                {
+                    track.Progress = audioPlayer.Progress * 800.0;
+                    await Task.Delay(30);
+                }
+
+                track.Progress = 0;
+                //});
+            }
+
+            hasPressedStopOnPlayAll = false;
+            playButton.IsEnabled = true;
+            playAllButton.IsEnabled = true;
+            playAllFromButton.IsEnabled = true;
+            stopButton.IsEnabled = false;
         }
 
         private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -474,7 +560,7 @@ namespace SoundEditorPlugin
 
         public override void Closed()
         {
-            audioPlayer.Dispose();
+            StopButton_Click(null, null);
         }
 
         private void FrostySoundDataEditor_Loaded(object sender, RoutedEventArgs e)
@@ -539,6 +625,72 @@ namespace SoundEditorPlugin
             });
 
             logger.Log("Exported {0} to {1}", AssetEntry.Name, sfd.FileName);
+        }
+
+        private void DuplicateTrackMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (tracksListBox.SelectedItem == null)
+                return;
+
+            int index = 0;
+            Dispatcher?.Invoke(() => { index = tracksListBox.SelectedIndex; });
+
+            dynamic soundWave = RootObject;
+
+            int[] variationsPerChunk = new int[(int)soundWave.Chunks.Count];
+            foreach (var rtVariation in soundWave.RuntimeVariations)
+            {
+                variationsPerChunk[rtVariation.ChunkIndex]++;
+            }
+
+            dynamic oldVariation = soundWave.RuntimeVariations[index];
+            dynamic soundDataChunk = soundWave.Chunks[oldVariation.ChunkIndex];
+            if (variationsPerChunk[oldVariation.ChunkIndex] > 1 && !Config.Get("AllowDuplicatingMultiReferencedChunks", false))
+            {
+                App.Logger.LogError("Duplicating tracks with multiple variations per chunk is currently disabled.");
+                FrostyMessageBox.Show("This tool does not support duplicating tracks with multiple variations per chunk. Please read the deatiled description of `Allow Duplicating Chunks with Multiple References` in sound editor settings for more information, or to enable anyway. -AdamRaichu", "Sound Editor");
+                return;
+            }
+            ChunkAssetEntry oldChunk = App.AssetManager.GetChunkEntry(soundDataChunk.ChunkId);
+            ChunkAssetEntry newChunk = DuplicationTool.DuplicateChunk(oldChunk);
+            newChunk.AddToBundles(oldChunk.Bundles);
+
+            dynamic newSoundDataChunk = TypeLibrary.CreateObject("SoundDataChunk");
+            newSoundDataChunk.ChunkId = newChunk.Id;
+
+            soundWave.Chunks.Add(newSoundDataChunk);
+
+            dynamic segment = TypeLibrary.CreateObject("SoundWaveVariationSegment");
+            segment.SeekTableOffset = 4294967295;
+            soundWave.Segments.Add(segment);
+
+            dynamic variation = TypeLibrary.CreateObject("SoundWaveRuntimeVariation");
+            variation.FirstSegmentIndex = (ushort)(soundWave.Segments.Count - 1);
+            variation.SegmentCount = (byte)1;
+            variation.ChunkIndex = (byte)(soundWave.Chunks.Count - 1);
+            variation.Weight = (byte)100;
+            soundWave.RuntimeVariations.Add(variation);
+
+            audioPlayer.Dispose();
+            audioPlayer = new AudioPlayer();
+
+            FrostyTaskWindow.Show("Adding track", "", (task) =>
+            {
+                List<SoundDataTrack> tracks = InitialLoad(task);
+
+                Dispatcher?.Invoke(() =>
+                {
+                    // mark asset as modified and link the chunk
+                    AssetModified = true;
+                    InvokeOnAssetModified();
+                    EbxAssetEntry assetEntry = AssetEntry as EbxAssetEntry;
+                    assetEntry.LinkAsset(newChunk);
+
+                    TracksList.Clear();
+                    foreach (var track in tracks)
+                        TracksList.Add(track);
+                });
+            });
         }
 
         private void SoundImportMenuItem_Click(object sender, RoutedEventArgs e)

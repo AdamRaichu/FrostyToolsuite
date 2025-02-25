@@ -73,6 +73,7 @@
     <ProjectReference Include="..\..\FrostySdk\FrostySdk.csproj">
       <Private>false</Private>
     </ProjectReference>
+    <ProjectReference Include="..\DuplicationPlugin\DuplicationPlugin.csproj" />
   </ItemGroup>
   
   <ItemGroup>

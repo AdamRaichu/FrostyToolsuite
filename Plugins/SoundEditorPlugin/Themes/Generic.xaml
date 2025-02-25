@@ -54,6 +54,30 @@
                                                     </Button.Content>
                                                 </Button>
                                                 <Slider Margin="8,0,0,0" x:Name="PART_VolumeSlider" VerticalAlignment="Center" Minimum="0" Maximum="100" LargeChange="20" SmallChange="2" IsSnapToTickEnabled="True" TickFrequency="1" Width="160"/>
+                                                <Button x:Name="PART_PlayAllButton" Height="22" Margin="0" ToolTip="Play all tracks one by one." IsEnabled="True">
+                                                    <Button.Content>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="22"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Image Grid.Column="0" Width="14" Source="/FrostyEditor;component/Images/Play.png"/>
+                                                            <TextBlock Grid.Column="1" Text="Play all" Margin="0,0,6,0" />
+                                                        </Grid>
+                                                    </Button.Content>
+                                                </Button>
+                                                <Button x:Name="PART_PlayAllFromButton" Height="22" Margin="0" ToolTip="Play all tracks one by one, starting from the selected track." IsEnabled="True">
+                                                    <Button.Content>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="22"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <Image Grid.Column="0" Width="14" Source="/FrostyEditor;component/Images/Play.png"/>
+                                                            <TextBlock Grid.Column="1" Text="Play all, starting from selected" Margin="0,0,6,0" />
+                                                        </Grid>
+                                                    </Button.Content>
+                                                </Button>
                                             </StackPanel>
                                         </Border>
                                     </DockPanel>
@@ -74,12 +98,17 @@
                                                     <Image Source="/FrostyEditor;component/Images/Import.png" Opacity="0.5"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
+                                            <MenuItem x:Name="PART_DuplicateTrackMenuItem" Header="Duplicate">
+                                                <MenuItem.Icon>
+                                                    <Image Source="/FrostyEditor;component/Images/Add.png" Opacity="0.5"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </ListView.ContextMenu>
                                     <ListView.View>
                                         <ctrl:FrostyAutoSizedGridView>
                                             <ctrl:FrostyAutoSizedGridView.Columns>
-                                                <GridViewColumn Header="Details">
+                                                <GridViewColumn Header="Details" Width="50">
                                                     <GridViewColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid Height="80">
@@ -100,7 +129,7 @@
                                                         </DataTemplate>
                                                     </GridViewColumn.CellTemplate>
                                                 </GridViewColumn>
-                                                <GridViewColumn Header="WaveForm">
+                                                <GridViewColumn Header="WaveForm" Width="800">
                                                     <GridViewColumn.CellTemplate>
                                                         <DataTemplate>
                                                             <Grid>
