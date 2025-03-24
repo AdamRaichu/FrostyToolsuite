@@ -108,7 +108,6 @@ namespace ReferencesPlugin
                 return;
 
             if (refExplorerToList.SelectedItem is EbxAssetEntry) {
-                App.Logger.Log("Opening blueprint editor (debug test)");
                 blueprintEditorHandler.OpenAssetAsGraph((EbxAssetEntry)refExplorerToList.SelectedItem);
             }
         }
@@ -119,7 +118,6 @@ namespace ReferencesPlugin
 
             if (refExplorerFromList.SelectedItem is EbxAssetEntry)
             {
-                App.Logger.Log("Opening blueprint editor (debug test)");
                 blueprintEditorHandler.OpenAssetAsGraph((EbxAssetEntry)refExplorerFromList.SelectedItem);
             }
         }
