@@ -657,7 +657,7 @@
                             </ctrl:FrostyTabControl.Style>
 
                             <!-- Available Mods -->
-                            <ctrl:FrostyTabItem Header="Available Mods">
+                            <ctrl:FrostyTabItem Header="Available Mods" x:Name="availableModsTabHeaderThing">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="26" />
@@ -1385,6 +1385,13 @@
                                                             Click="removeButton_Click"
                                                             ToolTip="Remove mod from list">
                                                         <Image Source="/FrostyModManager;component/Images/Remove.png"
+                                                               Margin="0,0,2,0" />
+                                                    </Button>
+                                                    <Button x:Name="uncheckAllButton"
+                                                            IsEnabled="True"
+                                                            Click="uncheckAllButton_Click"
+                                                            ToolTip="Deselect all mods">
+                                                        <Image Source="/FrostyModManager;component/Images/Merge.png"
                                                                Margin="0,0,2,0" />
                                                     </Button>
                                                 </StackPanel>

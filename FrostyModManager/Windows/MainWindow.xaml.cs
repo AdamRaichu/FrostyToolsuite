@@ -490,6 +490,8 @@ namespace FrostyModManager
                 orderComboBox.SelectedIndex = 1;
             }
 
+            availableModsTabHeaderThing.Header = "Available Mods (" + availableMods.Count + ")";
+
             GC.Collect();
         }
 
@@ -617,6 +619,14 @@ namespace FrostyModManager
 
             appliedModsList.SelectedIndex = selectedIndex;
             updateAppliedModButtons();
+        }
+
+        private void uncheckAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (FrostyAppliedMod mod in appliedModsList.Items)
+                mod.IsEnabled = false;
+            appliedModsList.Items.Refresh();
+            selectedPack.Refresh();
         }
 
         private void upButton_Click(object sender, RoutedEventArgs e)
@@ -800,6 +810,8 @@ namespace FrostyModManager
 
             ICollectionView view = CollectionViewSource.GetDefaultView(availableModsList.ItemsSource);
             view.Refresh();
+
+            availableModsTabHeaderThing.Header = "Available Mods (" + availableMods.Count + ")";
         }
 
         private void uninstallModButton_Click(object sender, RoutedEventArgs e)
@@ -834,6 +846,8 @@ namespace FrostyModManager
             availableModsList.SelectedItem = null;
             ICollectionView view = CollectionViewSource.GetDefaultView(availableModsList.ItemsSource);
             view.Refresh();
+
+            availableModsTabHeaderThing.Header = "Available Mods (" + availableMods.Count + ")";
 
             selectedPack.Refresh();
             appliedModsList.Items.Refresh();
@@ -1561,6 +1575,8 @@ namespace FrostyModManager
                 upButton.IsEnabled = false;
                 downButton.IsEnabled = false;
             }
+
+            appliedModsTabItem.Header = "Applied Mods (" + selectedPack.AppliedMods.Count + ")";
         }
 
         private void availableModsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1574,6 +1590,7 @@ namespace FrostyModManager
 
             // focus on tab item
             appliedModsTabItem.IsSelected = true;
+            updateAppliedModButtons();
         }
 
         public List<Control> AllChildren(DependencyObject parent)
