@@ -33,6 +33,9 @@ namespace ReferencesPlugin
         private const string PART_RefExplorerToOpenBlueprintEditor = "PART_RefExplorerToOpenBlueprintEditor";
         private const string PART_RefExplorerFromOpenBlueprintEditor = "PART_RefExplorerFromOpenBlueprintEditor";
 
+        private const string PART_RefExplorerToCopyGUID = "PART_RefExplorerToCopyGUID";
+        private const string PART_RefExplorerFromCopyGUID = "PART_RefExplorerFromCopyGUID";
+
         private FrostyAssetListView refExplorerToList;
         private FrostyAssetListView refExplorerFromList;
         private TextBlock refExplorerToText;
@@ -81,6 +84,10 @@ namespace ReferencesPlugin
             refExplorerToOpenBlueprintEditor = GetTemplateChild(PART_RefExplorerToOpenBlueprintEditor) as MenuItem;
             refExplorerFromOpenBlueprintEditor = GetTemplateChild(PART_RefExplorerFromOpenBlueprintEditor) as MenuItem;
 
+            // Bind Copy GUID Elements
+            MenuItem refExplorerToCopyGUID = GetTemplateChild(PART_RefExplorerToCopyGUID) as MenuItem;
+            MenuItem refExplorerFromCopyGUID = GetTemplateChild(PART_RefExplorerFromCopyGUID) as MenuItem;
+
             // Double Click Asset to Open
             refExplorerToList.SelectedAssetDoubleClick += ReferenceExplorerList_SelectedAssetDoubleClick;
             refExplorerFromList.SelectedAssetDoubleClick += ReferenceExplorerList_SelectedAssetDoubleClick;
@@ -97,9 +104,32 @@ namespace ReferencesPlugin
             refExplorerToOpenBlueprintEditor.Click += contextMenuRefExplorerToOpenBlueprintEditor_Click;
             refExplorerFromOpenBlueprintEditor.Click += contextMenuRefExplorerFromOpenBlueprintEditor_Click;
 
+            // Copy GUID
+            refExplorerToCopyGUID.Click += contextMenuRefExplorerToCopyGUID_Click;
+            refExplorerFromCopyGUID.Click += contextMenuRefExplorerFromCopyGUID_Click;
+
             Loaded += ReferenceTabItem_Loaded;
 
             App.EditorWindow.DataExplorer.SelectionChanged += dataExplorer_SelectionChanged;
+        }
+
+        private void contextMenuRefExplorerToCopyGUID_Click(object sender, RoutedEventArgs e)
+        {
+            if (refExplorerToList.SelectedItem == null)
+                return;
+            if (refExplorerToList.SelectedItem is EbxAssetEntry entry)
+            {
+                Clipboard.SetText(entry.Guid.ToString());
+            }
+        }
+        private void contextMenuRefExplorerFromCopyGUID_Click(object sender, RoutedEventArgs e)
+        {
+            if (refExplorerFromList.SelectedItem == null)
+                return;
+            if (refExplorerFromList.SelectedItem is EbxAssetEntry entry)
+            {
+                Clipboard.SetText(entry.Guid.ToString());
+            }
         }
 
         private void contextMenuRefExplorerToOpenBlueprintEditor_Click(object sender, RoutedEventArgs e)
