@@ -1,4 +1,31 @@
-﻿v1.0.6.3
+﻿AdamRaichu's Custom Build
+-------------------------
+
+This build is a collection of edits to various plugins. For the most part, they are centered around a custom build of the Blueprint Editor by ywingpilot2. Ywing has asked that I not distribute a custom build of the Blueprint Editor *publicly* to prevent a sort of "xyz plugin but better" issue that has apparently been a problem with Frosty plugins for a long time. Normally, I would just PR any changes I make to the plugin; I am totally for the sharing of information and tools. Gatekeeping is *also* a problem. However, the changes I have made rely on this custom build of the FrostyCore library. I haven't yet figured out a good way to make those changes available without breaking other people's stuff. This leaves me unable to share these custom plugins publicly. The same would now go for you; please don't share these around. If there's someone you think would be helped by them, let me know. Yes I know the code is public on my repo. There doesn't seem to be a problem with that. I just can't promote these publicly.
+
+With that out of the way, here is the actual list of changes, roughly in the order I implemented them. Some of these changes were made available publicly; contact me if you have questions.
+
+ - [FrostyCore] Add `Open in Blueprint Editor` button to the pointer ref dropdown in the property grid.
+  -> This required a custom build of the [BlueprintEditorPlugin], and began the private fork.
+  -> This change was implemented in the public Blueprint Editor build as well via a PR.
+ - [ReferencesPlugin] Add `Open in Blueprint Editor` button.
+ - [FrostyCore] Added a counter to the `View Instances` button that shows how many root objects an asset has.
+ - [BlueprintEditorPlugin] Rebuilt with icon for hashing utilities window.
+  -> This was a port of a PR I made to the public version.
+ - [FrostyModManager] Add counter to tab titles for available and applied mods.
+ - [FrostyModManager] Add deselect all button to controls tab.
+ - [ReferencesPlugin] Add `Copy GUID` context menu option.
+ - [ReferencesPlugin] Add images to context menu options that did not previously have them.
+ - [ReferencesPlugin] Add `Display Reference Details` context menu option. Details are displayed in a text block below the rest of the tab.
+  -> This was a port of a feature from Mophead's version he posted on nexus with several other plugins. (Most of these are outdated now, but I will be looking at a few of the others for hidden gems.)
+ - [ReferencesPlugin] Add `Reference Plugin Cache` context menu option under `Tools/Generate Cache` titlebar menu.
+ - [ReferencesPlugin] Add `Copy file path` context menu option.
+ - [FrostyEditor] Add entry to changelog explaining this fork.
+ - [FrostyEditor] Add an export button to the toolbar (next to New Project, Open Project, Save Project, and Save Project As).
+  -> Button is only enabled if there are changes in the current project (same as the default export button).
+ - [ReferencesPlugin] Fix typo in a log message.
+
+v1.0.6.3
 --------
 - Improved performance of the EbxWriter
 - Improved import for collections (#317)

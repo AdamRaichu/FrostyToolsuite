@@ -205,6 +205,15 @@
                                     <Image Source="/FrostyEditor;component/Images/SaveAs.png"
                                            Width="16" />
                                 </Button>
+                                <Button Margin="4,0,0,0"
+                                        Height="20"
+                                        Width="20"
+                                        ToolTip="Export to Mod"
+                                        Command="{StaticResource exportModMenuItemCommand}"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                                    <Image Source="/FrostyEditor;component/Images/Export.png"
+                                           Width="16" />
+                                </Button>
                                 <!--<Border Width="1" Background="#D0D0D0" Margin="8,3,2,3"/>-->
                             </StackPanel>
                         </Border>
