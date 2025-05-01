@@ -24,6 +24,8 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [FrostyEditor] Add an export button to the toolbar (next to New Project, Open Project, Save Project, and Save Project As).
   -> Button is only enabled if there are changes in the current project (same as the default export button).
  - [ReferencesPlugin] Fix typo in a log message.
+ - [FrostyEditor] Fix a crash caused by the extra export item menu. 
+ - [FrostyEditor] Add context menu options to bookmarks tab.
 
 v1.0.6.3
 --------
