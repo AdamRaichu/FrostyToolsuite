@@ -26,6 +26,8 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [ReferencesPlugin] Fix typo in a log message.
  - [FrostyEditor] Fix a crash caused by the extra export item menu. 
  - [FrostyEditor] Add context menu options to bookmarks tab.
+ - [FrostyCore] Add "Open in Blueprint Editor" ToolbarItem to default list.
+ - [FrostyEditor] Remove extra export button because it was somehow causing crashing.
 
 v1.0.6.3
 --------
