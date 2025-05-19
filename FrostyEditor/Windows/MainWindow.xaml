@@ -233,7 +233,6 @@
                                     <Image Source="/FrostyEditor;component/Images/SaveAs.png"
                                            Width="16" />
                                 </Button>
-                                <!-- Stupid thing causes crashes and idk why
                                 <Button Margin="4,0,0,0"
                                         Height="20"
                                         Width="20"
@@ -243,7 +242,6 @@
                                     <Image Source="/FrostyEditor;component/Images/Export.png"
                                            Width="16" />
                                 </Button>
-                                -->
                                 <!--<Border Width="1" Background="#D0D0D0" Margin="8,3,2,3"/>-->
                             </StackPanel>
                         </Border>

@@ -828,9 +828,9 @@ namespace FrostySdk.Managers
 
         public uint GetModifiedCount()
         {
-            uint modifiedEbx = (uint)ebxList.Values.Count((EbxAssetEntry entry) => entry.IsModified);
-            uint modifiedRes = (uint)resList.Values.Count((ResAssetEntry entry) => entry.IsModified);
-            uint modifiedChunks = (uint)chunkList.Values.Count((ChunkAssetEntry entry) => entry.IsModified);
+            uint modifiedEbx = (uint)ebxList.Values.ToList().Count((EbxAssetEntry entry) => entry.IsModified);
+            uint modifiedRes = (uint)resList.Values.ToList().Count((ResAssetEntry entry) => entry.IsModified);
+            uint modifiedChunks = (uint)chunkList.Values.ToList().Count((ChunkAssetEntry entry) => entry.IsModified);
             uint modifiedCustom = 0;
             foreach (ICustomAssetManager mgr in customAssetManagers.Values)
                 modifiedCustom += (uint)mgr.EnumerateAssets(modifiedOnly: true).Count();

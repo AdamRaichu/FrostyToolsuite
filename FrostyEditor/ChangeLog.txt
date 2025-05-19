@@ -28,6 +28,14 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [FrostyEditor] Add context menu options to bookmarks tab.
  - [FrostyCore] Add "Open in Blueprint Editor" ToolbarItem to default list.
  - [FrostyEditor] Remove extra export button because it was somehow causing crashing.
+ - [FrostyEditor] Restore the extra export button.
+ - [FrostySdk] Make some changes which fix a crash caused by the extra export button.
+ - [FrostyModManager] Add "applied" state filter from @Skylark13's PR (CadeEvs/FrostyToolsuite#346).
+ - [FrostyModManager] Add applied mod counter and available mod counter (from another branch).
+ - [FrostyModManager] Add/update "disable all selected" button. It is now toggle all, but also has options to enable/disable all. Read the tooltip for details.
+
+(I really have gotten out of the original scope of this branch; it's now just everything. Oh well.)
+
 
 v1.0.6.3
 --------
