@@ -1423,7 +1423,7 @@
                                                     <Button x:Name="uncheckAllButton"
                                                             IsEnabled="False"
                                                             Click="uncheckAllButton_Click"
-                                                            ToolTip="Toggle enabled for all selected mods &#x0a;Shift click to disable all selected &#x0a;Ctrol Shift click to enable all selected">
+                                                            ToolTip="Toggle enabled for all selected mods &#x0a;Shift click to disable all selected &#x0a;Ctrl Shift click to enable all selected">
                                                         <Image Source="/FrostyModManager;component/Images/Merge.png"
                                                                Margin="0,0,2,0" />
                                                     </Button>
