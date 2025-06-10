@@ -1933,6 +1933,7 @@ namespace FrostyModManager
             if (tb.IsFocused)
                 tb.MoveFocus(new TraversalRequest(FocusNavigationDirection.Previous));
             tb.ScrollToEnd();
+            logTabItem.Header = $"Log ({tb.Text.Split("\n".ToCharArray()).Length - 1})";
         }
 
         private void availableModsFilter_KeyUp(object sender, KeyEventArgs e)

@@ -1476,7 +1476,8 @@
                                     </Style>
                                 </ctrl2:FrostyTabControl.Style>
                                 <ctrl2:FrostyTabItem Header="Log"
-                                                     CloseButtonVisible="False">
+                                                     CloseButtonVisible="False"
+                                                     x:Name="logTabItem">
                                     <Grid>
                                         <Border BorderBrush="{StaticResource ControlBackground}"
                                                 RenderOptions.EdgeMode="Aliased"

@@ -480,9 +480,27 @@ namespace ReferencesPlugin
                 }
             }
 
+            //refExplorerToText.Text = "References to " + entry.Filename + " (" + refToItems.Count + ")";
+            //refExplorerFromText.Text = "References from " + entry.Filename + " (" + refFromItems.Count + ")";
+
+            //labelText = $"References ({refToItems.Count} & {refFromItems.Count})";
+
+            foreach (var item in App.EditorWindow.MiscTabControl.Items)
+            {
+                if (item is FrostyTabItem) {
+                    FrostyTabItem tab = item as FrostyTabItem;
+                    if (tab.Header.ToString().Contains("References"))
+                    {
+                        tab.Header = $"References ({refToItems.Count} & {refFromItems.Count})";
+                    }
+                }
+            }
+
             refExplorerToList.ItemsSource = refToItems;
             refExplorerFromList.ItemsSource = refFromItems;
         }
+
+        //public string labelText = "References (0 & 0)";
 
         private void LoadCache()
         {

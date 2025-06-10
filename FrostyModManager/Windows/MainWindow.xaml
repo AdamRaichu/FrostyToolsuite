@@ -1089,7 +1089,7 @@
                                 </Grid>
                             </ctrl:FrostyTabItem>
                             <!-- Log -->
-                            <ctrl:FrostyTabItem Header="Log">
+                            <ctrl:FrostyTabItem Header="Log" x:Name="logTabItem">
                                 <Grid>
                                     <Border BorderBrush="{StaticResource ControlBackground}"
                                             RenderOptions.EdgeMode="Aliased"
