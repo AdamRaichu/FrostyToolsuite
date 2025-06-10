@@ -518,7 +518,7 @@ namespace FrostyModManager
                 orderComboBox.SelectedIndex = 1;
             }
 
-            availableModsTabHeaderThing.Header = "Available Mods (" + availableMods.Count + ")";
+            availableModsTabHeaderThing.Header = "Available Mods (" + availableModsList.Items.Count + ")";
 
             FrameworkElementFactory factory = new FrameworkElementFactory(typeof(Image));
             factory.SetValue(Image.SourceProperty, new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyModManager;component/Images/CircleCheck.png") as ImageSource);
@@ -875,7 +875,7 @@ namespace FrostyModManager
             ICollectionView view = CollectionViewSource.GetDefaultView(availableModsList.ItemsSource);
             view.Refresh();
 
-            availableModsTabHeaderThing.Header = "Available Mods (" + availableMods.Count + ")";
+            availableModsTabHeaderThing.Header = "Available Mods (" + availableModsList.Items.Count + ")";
         }
 
         private void uninstallModButton_Click(object sender, RoutedEventArgs e)
