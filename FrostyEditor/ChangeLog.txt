@@ -36,8 +36,11 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [FrostyModManager] Add log message counter to header.
   -> Technically this count is based on the number of newline characters not log messages but it works as far as I can tell.
  - [FrostyEditor] Add log message counter to header (which functions the same as above ^).
- - [ReferencesPlugin] Add counter for how many assets are referenced. Note that this will not show until the references tab has been clicked at least once, but no longer needs to be focused after that.
+ - [ReferencesPlugin] Add counter for how many assets are referenced. 
+  -> Note that this will not show until the references tab has been clicked at least once, but no longer needs to be focused after that.
  - [ReferencesPlugin] Add new config option to hide NetRegs from the "references to ___" list.
+ - [BundleEditorPlugin] Add counter for how many bundles the asset is in. Displays as `Bundles (<default> + <added>)`.
+  -> Note that this will not show until the bundles tab has been clicked at least once, but no longer needs to be focused after that.
 
 (I really have gotten out of the original scope of this branch; it's now just everything. Oh well.)
 

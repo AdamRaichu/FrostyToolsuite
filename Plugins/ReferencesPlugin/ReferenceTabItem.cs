@@ -497,7 +497,7 @@ namespace ReferencesPlugin
                 }
             }
 
-            refExplorerToText.Text = "";
+            refExplorerToTextBlockInfo.Text = "";
             int hiddenNetRegs = 0;
             refExplorerToList.ItemsSource = refToItems.Where((entryWhere) => {
                 ReferencesOptions options = new ReferencesOptions();
