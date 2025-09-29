@@ -499,21 +499,51 @@ namespace ReferencesPlugin
 
             refExplorerToTextBlockInfo.Text = "";
             int hiddenNetRegs = 0;
+            int hiddenMVDBs = 0;
             refExplorerToList.ItemsSource = refToItems.Where((entryWhere) => {
                 ReferencesOptions options = new ReferencesOptions();
                 options.Load();
-                if (!options.ShowNetRegs)
+                if (entryWhere.Type == "NetworkRegistryAsset" && !options.ShowNetRegs)
                 {
-                    if (entryWhere.Type == "NetworkRegistryAsset")
-                    {
-                        hiddenNetRegs++;
-                        return false;
-                    }
+                    hiddenNetRegs++;
+                    return false;
                 }
-                return true;
+                else if (entryWhere.Type == "MeshVariationDatabase" && !options.ShowMVDBs)
+                {
+                    hiddenMVDBs++;
+                    return false;
+                }
+                else {
+                    return true;
+                }
             });
-            if (hiddenNetRegs > 0)
-                refExplorerToTextBlockInfo.Text = $"(Hiding {hiddenNetRegs} NetworkRegistryAsset{(hiddenNetRegs > 1 ? "s" : "")})";
+            bool isHidingNetRegs = hiddenNetRegs > 0;
+            bool isHidingMVDBs = hiddenMVDBs > 0;
+            bool isHidingBoth = isHidingNetRegs && isHidingMVDBs;
+            bool isHidingEither = isHidingNetRegs || isHidingMVDBs;
+
+            // idek if this whole thing is necessary bc idk if meshes can be referenced
+            // by netregs and mvdbs but I wrote it already so whatever
+            string output = "";
+            if (isHidingEither) {
+                output += "(Hiding ";
+                if (isHidingNetRegs) {
+                    output += hiddenNetRegs.ToString();
+                    output += " NetReg(s)";
+                }
+                if (isHidingBoth)
+                {
+                    output += " and ";
+                }
+                if (isHidingMVDBs)
+                {
+                    output += hiddenMVDBs.ToString();
+                    output += " MVDB(s)";
+                }
+                output += ".)";
+            }
+            refExplorerToTextBlockInfo.Text = output;
+
             refExplorerFromList.ItemsSource = refFromItems;
         }
 

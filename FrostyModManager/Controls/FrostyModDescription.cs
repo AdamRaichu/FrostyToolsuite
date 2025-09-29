@@ -1,4 +1,5 @@
-﻿using Frosty.Core.Mod;
+﻿using Frosty.Controls;
+using Frosty.Core.Mod;
 using FrostySdk;
 using FrostySdk.IO;
 using System.Collections.Generic;
@@ -46,11 +47,15 @@ namespace FrostyModManager.Controls
         private const string PART_ModIcon = "PART_ModIcon";
         private const string PART_ModFilesListBox = "PART_ModFilesListBox";
         private const string PART_LoadingText = "PART_LoadingText";
+        private const string PART_CopyFilesListButton = "PART_CopyFilesListButton";
+        private const string PART_ScreenshotsLayerRow = "PART_ScreenshotsLayerRow";
 
         private StackPanel screenshotPanel;
         private Image modIcon;
         private ListBox modFilesListBox;
         private TextBlock loadingText;
+        private Button copyFilesListButton;
+        private RowDefinition screenshotsLayerRow;
 
         #region -- Properties --
 
@@ -87,6 +92,8 @@ namespace FrostyModManager.Controls
             modIcon = GetTemplateChild(PART_ModIcon) as Image;
             modFilesListBox = GetTemplateChild(PART_ModFilesListBox) as ListBox;
             loadingText = GetTemplateChild(PART_LoadingText) as TextBlock;
+            copyFilesListButton = GetTemplateChild(PART_CopyFilesListButton) as Button;
+            screenshotsLayerRow = GetTemplateChild(PART_ScreenshotsLayerRow) as RowDefinition;
 
             Loaded += FrostyModDescription_Loaded;
         }
@@ -115,6 +122,8 @@ namespace FrostyModManager.Controls
                         Image img = o as Image;
                         screenshotClicked?.Invoke(this, new ScreenshotButtonEventArgs(img.Source));
                     };
+
+                    screenshotsLayerRow.Height = new GridLength(100, GridUnitType.Pixel);
                 }
 
                 List<AffectedFileInfo> affectedFiles = new List<AffectedFileInfo>();
@@ -197,6 +206,15 @@ namespace FrostyModManager.Controls
 
                 loadingText.Visibility = Visibility.Collapsed;
                 modFilesListBox.ItemsSource = affectedFiles;
+
+                copyFilesListButton.Click += (o, e2) =>
+                {
+                    string filesList = "";
+                    foreach (AffectedFileInfo fileInfo in affectedFiles)
+                        filesList += $"{fileInfo.Name}\n";
+                    Clipboard.SetText(filesList);
+                    FrostyMessageBox.Show("File list copied to clipboard.", "Copied", MessageBoxButton.OK);
+                };
             }
         }
     }

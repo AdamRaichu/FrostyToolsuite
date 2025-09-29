@@ -1703,6 +1703,8 @@ namespace FrostyModManager
 
             // Re-run filter since we might be filtering on applied mods.
             RefreshFilter();
+
+            updateAppliedModButtons();
         }
 
         private void SelectedProfile_AppliedModsUpdated(object sender, RoutedEventArgs e)

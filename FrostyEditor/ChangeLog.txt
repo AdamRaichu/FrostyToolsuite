@@ -41,6 +41,9 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [ReferencesPlugin] Add new config option to hide NetRegs from the "references to ___" list.
  - [BundleEditorPlugin] Add counter for how many bundles the asset is in. Displays as `Bundles (<default> + <added>)`.
   -> Note that this will not show until the bundles tab has been clicked at least once, but no longer needs to be focused after that.
+ - [FrostyModManager] Add "Copy to Clipboard" button for the Affected Files list.
+ - [FrostyModManager] Hide the screenshots menu if there are no screenshots in the mod (to make use of all available space).
+ - [FrostyModManager] Fix Applied Mods counters not updating when pressing the Add mod button.
 
 (I really have gotten out of the original scope of this branch; it's now just everything. Oh well.)
 
