@@ -44,6 +44,7 @@ With that out of the way, here is the actual list of changes, roughly in the ord
  - [FrostyModManager] Add "Copy to Clipboard" button for the Affected Files list.
  - [FrostyModManager] Hide the screenshots menu if there are no screenshots in the mod (to make use of all available space).
  - [FrostyModManager] Fix Applied Mods counters not updating when pressing the Add mod button.
+ - [ReferencesPlugin] Add new config option to hide MVDBs from the "references to ___" list.
 
 (I really have gotten out of the original scope of this branch; it's now just everything. Oh well.)
 
