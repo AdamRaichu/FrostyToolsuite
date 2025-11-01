@@ -34,6 +34,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using Frosty.Core.Attributes;
 using Frosty.Core.Misc;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace FrostyEditor
 {
@@ -96,6 +98,8 @@ namespace FrostyEditor
             RoutedCommand addBookmarkCmd = new RoutedCommand();
             RoutedCommand removeBookmarkCmd = new RoutedCommand();
             RoutedCommand launchGameCmd = new RoutedCommand();
+            RoutedCommand kyberLaunchGameCmd = new RoutedCommand();
+            RoutedCommand kyberSettingsGameCmd = new RoutedCommand();
             RoutedCommand focusAssetFilterCmd = new RoutedCommand();
 
             newCmd.InputGestures.Add(new KeyGesture(Key.N, ModifierKeys.Control));
@@ -105,6 +109,8 @@ namespace FrostyEditor
             addBookmarkCmd.InputGestures.Add(new KeyGesture(Key.B, ModifierKeys.Control));
             removeBookmarkCmd.InputGestures.Add(new KeyGesture(Key.B, ModifierKeys.Control | ModifierKeys.Shift));
             launchGameCmd.InputGestures.Add(new KeyGesture(Key.F5));
+            kyberLaunchGameCmd.InputGestures.Add(new KeyGesture(Key.F6));
+            kyberSettingsGameCmd.InputGestures.Add(new KeyGesture(Key.F7));
             focusAssetFilterCmd.InputGestures.Add(new KeyGesture(Key.F, ModifierKeys.Control));
 
             CommandBindings.Add(new CommandBinding(newCmd, newModMenuItem_Click));
@@ -118,7 +124,11 @@ namespace FrostyEditor
             if (ProfilesLibrary.EnableExecution)
             {
                 CommandBindings.Add(new CommandBinding(launchGameCmd, launchButton_Click));
+                CommandBindings.Add(new CommandBinding(kyberLaunchGameCmd, kyberLaunchButton_Click));
+                CommandBindings.Add(new CommandBinding(kyberSettingsGameCmd, kyberSettingsButton_Click));
                 launchButton.IsEnabled = true;
+                kyberLaunchButton.IsEnabled = true;
+                kyberSettingsButton.IsEnabled = true;
             }
 
             InitGameSpecificMenus();
@@ -208,7 +218,7 @@ namespace FrostyEditor
                     if (parentMenuItem == null)
                     {
                         parentMenuItem = foundMenuItem;
-                        foundMenuItem = new MenuItem { Header = menuExtension.SubLevelMenuName };
+                        foundMenuItem = new MenuItem { Header = menuExtension.SubLevelMenuName, Icon = new Image() { Source = menuExtension.ParentIcon } };
                         parentMenuItem.Items.Add(foundMenuItem);
                     }
                 }
@@ -399,7 +409,7 @@ namespace FrostyEditor
 
             // get all mods
             List<string> modPaths = new List<string>();
-            
+
             DirectoryInfo modDirectory = new DirectoryInfo($"Mods/{ProfilesLibrary.ProfileName}");
             foreach (string modPath in Directory.EnumerateFiles($"Mods/{ProfilesLibrary.ProfileName}/", "*.fbmod", SearchOption.AllDirectories))
             {
@@ -412,12 +422,12 @@ namespace FrostyEditor
                     modPaths.Add(Path.GetFileName(modPath));
                 }
             }
-            
+
             Random r = new Random();
             string editorModName = $"EditorMod_{r.Next(1000, 9999):D4}.fbmod";
-            
+
             // create temporary editor mod
-            ModSettings editorSettings = new ModSettings { Title = editorModName, Author = "Frosty Editor", Version = App.Version, Category = "Editor"};
+            ModSettings editorSettings = new ModSettings { Title = editorModName, Author = "Frosty Editor", Version = App.Version, Category = "Editor" };
 
             // apply mod
             string additionalArgs = Config.Get<string>("CommandLineArgs", "", ConfigScope.Game) + " ";
@@ -429,7 +439,7 @@ namespace FrostyEditor
             try
             {
                 // run mod applying process
-                FrostyTaskWindow.Show("Launching", "", (task) => 
+                FrostyTaskWindow.Show("Launching", "", (task) =>
                 {
                     try
                     {
@@ -497,6 +507,175 @@ namespace FrostyEditor
             launchButton.IsEnabled = true;
 
             GC.Collect();
+        }
+        
+        private void kyberLaunchButton_Click(object sender, RoutedEventArgs e)
+        {
+            //List<ExportActionOverride> actions =  App.PluginManager.GetExportActionOverrides().Where(lst => !new List<ExportType> { ExportType.All, ExportType.LaunchOnly, ExportType.KyberLaunchOnly}.Contains(lst.Item2)).Select(lst => lst.Item3).ToList();
+
+            KyberJsonSettings jsonSettings = KyberIntegration.GetKyberJsonSettings();
+            if (!KyberIntegration.DoesCliExist())
+                return;
+            CancellationTokenSource cancelToken = new CancellationTokenSource();
+            string editorModName = "KyberMod.fbmod";
+
+            //
+            // Export Mod Order Json
+            //
+
+            KyberModsJson exportJson = new KyberModsJson();
+            string basePath = $@"{(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)).Replace("\\", @"/")}/Mods/Kyber";
+            exportJson.basePath = basePath;
+
+            List<string> fbmodNames = KyberIntegration.GetLoadOrder(basePath);
+            exportJson.modPaths = new List<string>(fbmodNames);
+
+            File.WriteAllText("Mods/Kyber/Kyber-Launch.json", JsonConvert.SerializeObject(exportJson, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented
+            }));
+
+            string editorModPath = $"Mods/Kyber/{editorModName}";
+            List<string> loadOrderModPaths = fbmodNames.Select(modName => $"Mods/Kyber/{modName}").ToList();
+            FrostyTaskWindow.Show("Preparing", "", (task) =>
+            {
+                //foreach (ExportActionOverride exportAction in actions)
+                //exportAction.PreExport(task, ExportType.KyberLaunchOnly, editorModPath, loadOrderModPaths);
+                // SKIP UNIMPLEMENTED PREEXPORTS
+            });
+
+
+
+            // create temporary editor mod
+            ModSettings editorSettings = new ModSettings { Title = editorModName, Author = "Frosty Editor", Version = App.Version, Category = "Editor" };
+
+            //
+            // Export Kyber mod
+            //
+            Random random = new Random();
+            bool cancelled = false;
+            try
+            {
+                // run mod applying process
+                FrostyTaskWindow.Show("Launching", "", (task) =>
+                {
+                    try
+                    {
+                        foreach (ExecutionAction executionAction in App.PluginManager.ExecutionActions)
+                        {
+                            executionAction.PreLaunchAction(task.TaskLogger, PluginManagerType.Editor, cancelToken.Token);
+                        }
+
+                        task.Update("Exporting Mod");
+                        ExportMod(editorSettings, editorModPath, true, cancelToken.Token);
+                        App.Logger.Log($"Editor Mod Saved As {editorModName}");
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        cancelled = true;
+                        // swollow
+                        foreach (ExecutionAction executionAction in App.PluginManager.ExecutionActions)
+                        {
+                            executionAction.PostLaunchAction(task.TaskLogger, PluginManagerType.ModManager, cancelToken.Token);
+                        }
+                    }
+
+                }, showCancelButton: true, cancelCallback: (task) => cancelToken.Cancel());
+            }
+            catch (OperationCanceledException)
+            {
+                // process was cancelled
+                App.Logger.Log("Launch Cancelled");
+                cancelled = true;
+            }
+            if (!cancelled)
+            {
+                //
+                // Export Kyber commands
+                //
+                List<string> commands = new List<string>();
+                if (!KyberSettings.FrontendLaunch)
+                {
+                    if (KyberSettings.AutoplayerType == "Dummy Bots")
+                    {
+                        commands.Add($"Whiteshark.AutoBalanceTeamsOnNeutral 1");
+                        commands.Add($"AutoPlayers.PlayerCount {KyberSettings.Team1Bots + KyberSettings.Team2Bots}");
+                    }
+                    else if (KyberSettings.AutoplayerType == "Gamemode Tied")
+                    {
+                        commands.Add($"AutoPlayers.ForceFillGameplayBotsTeam1 {KyberSettings.Team1Bots}");
+                        commands.Add($"AutoPlayers.ForceFillGameplayBotsTeam2 {KyberSettings.Team2Bots}");
+                    }
+
+                    commands.Add($"Kyber.SetTeamByIndex 0 {KyberSettings.TeamId}");
+                    if (KyberSettings.Autostart)
+                        commands.Add($"Kyber.startgame");  //commands.Add($"Kyber.Delay 5 startgame");
+                }
+
+                foreach (string command in KyberSettings.LaunchCommands)
+                    commands.Add($"{command}");
+
+                using (StreamWriter writer = new StreamWriter("Mods/Kyber/Kyber-Commands.txt"))
+                {
+                    foreach (string str in commands)
+                        writer.WriteLine(str);
+                }
+
+                //
+                //  Execute kyber_cli.exe
+                //
+                int randomNumber = random.Next();
+                string cliCommand = (KyberSettings.FrontendLaunch ? "start_game" : "start_server") + $" --module-branch=main --raw-mods \"{$@"{basePath}/Kyber-Launch.json"}\"" + (KyberSettings.DebugMode ? " --verbose --debug" : "");
+                if (!KyberSettings.FrontendLaunch)
+                    cliCommand += $" --server-password \"Mophead{randomNumber}\" --no-dedicated --server-name \"Test\" --map \"{KyberSettings.Level}\" --mode \"{KyberSettings.GameMode}\" --startup-commands \"{$@"{basePath}/Kyber-Commands.txt"}\"";
+                App.Logger.Log(cliCommand);
+
+                ProcessStartInfo psi = new ProcessStartInfo(KyberSettings.CliDirectory);
+                psi.EnvironmentVariables["KYBER_ONLINE_MODE"] = "0";
+                psi.EnvironmentVariables["KYBER_ALLOW_DEDICATED"] = "1";
+                if (KyberSettings.DebugMode)
+                {
+                    psi.EnvironmentVariables["KYBER_PROPERTY_DEBUG"] = "1";
+                    psi.EnvironmentVariables["KYBER_LOG_LEVEL"] = "debug";
+                    psi.EnvironmentVariables["MAXIMA_LAUNCH_ARGS"] = "-Kyber.RenderPropertyDebug true";
+                }
+
+                psi.Arguments = cliCommand;
+                //psi.RedirectStandardInput = true;
+                //psi.RedirectStandardOutput = true;
+                psi.UseShellExecute = false;
+                psi.CreateNoWindow = false; // Show cmd window
+                psi.WorkingDirectory = Path.GetDirectoryName(KyberSettings.CliDirectory); // Set the working directory here
+
+                // Start the process and read the output
+                Process process = Process.Start(psi);
+                //if (process != null)
+                //{
+                //    process.StandardInput.WriteLine("exit");
+
+                //    // Read the output
+                //    string result = process.StandardOutput.ReadToEnd();
+                //    App.Logger.Log(result);
+
+                //    //process.WaitForExit();
+                //    //process.Close();
+                //}
+            }
+
+
+            FrostyTaskWindow.Show("Completing", "", (task) =>
+            {
+                //foreach (ExportActionOverride exportAction in actions)
+                    //exportAction.PostExport(task, ExportType.KyberLaunchOnly, editorModPath, loadOrderModPaths);
+            });
+
+            GC.Collect();
+        }
+
+        private void kyberSettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            KyberSettingsWindow win = new KyberSettingsWindow(KyberIntegration.GetKyberJsonSettings());
+            win.ShowDialog();
         }
 
         private void unimplementedMenuItem_Click(object sender, RoutedEventArgs e)

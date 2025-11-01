@@ -1,4 +1,5 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Windows.Media;
 
 namespace Frosty.Core
 {
@@ -45,5 +46,7 @@ namespace Frosty.Core
         /// </summary>
         /// <returns>The action to perform when the menu item is clicked.</returns>
         public virtual RelayCommand MenuItemClicked { get; }
+
+        public virtual ImageSource ParentIcon { get; } = new ImageSourceConverter().ConvertFromString("pack://application:,,,/FrostyEditor;component/Images/Forward.png") as ImageSource;
     }
 }
